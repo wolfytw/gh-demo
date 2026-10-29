@@ -5,7 +5,7 @@ def bmi(weight_kg: float, height_cm: float) -> float:
     if height_cm <= 0:
         raise ValueError("身高必須大於 0")
     h = height_cm / 100
-    return round(weight_kg / (h * h), 1)
+    return round(weight_kg / (h * 2), 1)
 
 
 def level(value: float) -> str:
