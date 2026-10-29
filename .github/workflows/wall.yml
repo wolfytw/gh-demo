@@ -1,0 +1,67 @@
+# 範例 A：說明會留言牆
+# 觀眾開一個 Issue（標題＝名字、內文＝一句話）→ 機器人自動回覆＋貼標籤 → 重建 GitHub Pages 留言牆
+# 事前設定：Settings → Pages → Source 選「GitHub Actions」
+
+name: 說明會留言牆
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  greet:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 機器人回覆並貼標籤
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const wall = `https://${context.repo.owner}.github.io/${context.repo.repo}/`;
+            await github.rest.issues.addLabels({
+              ...context.repo, issue_number: issue.number, labels: ['留言牆']
+            });
+            await github.rest.issues.createComment({
+              ...context.repo, issue_number: issue.number,
+              body: `👋 @${issue.user.login} 歡迎來到說明會！\n\n你的留言約 1 分鐘後會出現在留言牆：${wall}\n\n> 這則回覆是 GitHub Actions 自動寫的，沒有任何人按按鈕。`
+            });
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 抓取所有留言
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 200 \
+            --json number,title,body,author,createdAt > issues.json
+
+      - name: 產生留言牆網頁
+        run: python3 scripts/build_wall.py issues.json _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: 發布到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
