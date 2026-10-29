@@ -1,13 +1,13 @@
-# GitHub Actions 招生說明會示範專案
+# GitHub Actions 示範專案
 
-兩個 3 分鐘內能演完的 GitHub Actions 範例，用公開 repo 時，GitHub 託管的標準 runner 免費。
+兩個 GitHub Actions 範例，用公開 repo 時，GitHub 託管的標準 runner 免費。
 
 | 範例 | 觸發方式 | 觀眾看到什麼 |
 |---|---|---|
 | A. 說明會留言牆（`wall.yml`） | 有人開 Issue | 機器人幾秒內自動回覆，約 1 分鐘後大螢幕留言牆出現他的名字 |
 | B. 九宮格平行測試（`ci.yml`） | push 或 Pull Request | 3 種作業系統 × 3 個 Python 版本，9 個測試同時跑；改壞程式就 9 格一起變紅、不能合併 |
 
-## 說明會前一天的設定（約 10 分鐘）
+## Demo的設定（約 10 分鐘）
 
 1. 在 GitHub 建立一個**公開** repo（例如 `gh-demo`），把這個資料夾的內容全部推上去。
 2. **Settings → Pages → Build and deployment → Source** 選 **GitHub Actions**。
